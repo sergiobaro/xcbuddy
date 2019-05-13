@@ -1,7 +1,11 @@
 #!/bin/bash
 
+# GLOBAL
+version="0.1"
+
 # FUNCTIONS
 
+# Find current selected Xcode file name
 find_current_xcode_app_name () {
   current_xcode_app_path=$(xcode-select -p | tr "/" " ")
   for path in $current_xcode_app_path; do
@@ -13,6 +17,7 @@ find_current_xcode_app_name () {
   echo $xcode_app_name
 }
 
+# Find in current directory a workspace or project file
 find_xcode_workspace_or_project () {
   for file in *.xcworkspace; do
     if [[ -d $file ]]; then
@@ -41,14 +46,21 @@ fi
 if [ $operation = "-h" ]; then
   echo "usage:"
   echo "-h : Prints help"
+  echo "-v : Prints current xcbuddy version"
   echo "-p : Prints current Xcode path"
-  echo "-s [xcode_version] : Change command line tools"
-  echo "-o [xcode_version] [project_file]: Open project with the specified Xcode version"
-  echo "-o: Open workspace or project in current directory with default Xcode version"
+  echo "-s [xcode_version] : Switch command line tools"
+  echo "-o [xcode_version] [project_file] : Open project with the specified Xcode version"
+  echo "-o : Open workspace or project in current directory with default Xcode version"
   echo "-d : Shows Xcode installed versions"
   echo "-m : Display available simulators"
 
   exit 0
+fi
+
+# Print current xcbuddy version
+# usage: xcbuddy -v
+if [ $operation = "-v" ]; then
+  echo "$version"
 fi
 
 # Print command line tools current path
