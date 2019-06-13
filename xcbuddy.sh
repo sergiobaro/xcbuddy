@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # GLOBAL
-version="0.1"
+version="0.2"
 
 # FUNCTIONS
 
@@ -53,6 +53,7 @@ if [ $operation = "-h" ]; then
   echo "-o : Open workspace or project in current directory with default Xcode version"
   echo "-d : Shows Xcode installed versions"
   echo "-m : Display available simulators"
+  echo "-x : Update (carthage & xcodegen) and open project with default settings"
 
   exit 0
 fi
@@ -123,4 +124,12 @@ fi
 if [ $operation = "-m" ]; then
   xcrun simctl list devices available
   exit 0
+fi
+
+# Update and open
+# usage: xcbuddy -x
+if [ $operation = "-x" ]; then
+  carthage bootstrap --platform ios
+  xcodegen
+  xcbuddy -o
 fi

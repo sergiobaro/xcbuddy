@@ -19,4 +19,5 @@ $ make install
   -o : Open workspace or project in current directory with default Xcode version
   -d : Shows Xcode installed versions
   -m : Display available simulators
+  -x : Update (carthage & xcodegen) and open project with default settings
 ```
