@@ -33,6 +33,29 @@ find_xcode_workspace_or_project () {
   done
 }
 
+# Resolve dependencies for: carthage, pods and swift package manager
+resolve_dependencies () {
+  if [ -f "Cartfile" ]; then
+    carthage bootstrap --platform ios
+  fi
+  if [ -f "Podfile" ]; then
+    pod install
+  fi
+  if [ -f "Package.swift" ]; then 
+    swift package update
+  fi
+}
+
+# Generate project file for: xcodegen and swift package manager
+generate_project () {
+  if [ -f "project.yml" ]; then
+    xcodegen
+  fi
+  if [ -f "Package.swift" ]; then
+    swift package generate-xcodeproj
+  fi 
+}
+
 # MAIN
 
 operation=$1
@@ -44,16 +67,16 @@ fi
 # Display help
 # usage: xcbuddy -h
 if [ $operation = "-h" ]; then
-  echo "usage:"
-  echo "-h : Prints help"
-  echo "-v : Prints current xcbuddy version"
-  echo "-p : Prints current Xcode path"
-  echo "-s [xcode_version] : Switch command line tools"
-  echo "-o [xcode_version] [project_file] : Open project with the specified Xcode version"
-  echo "-o : Open workspace or project in current directory with default Xcode version"
-  echo "-d : Shows Xcode installed versions"
-  echo "-m : Display available simulators"
-  echo "-x : Update (carthage & xcodegen) and open project with default settings"
+  echo "Usage:"
+  echo "  -h : Prints help"
+  echo "  -v : Prints current xcbuddy version"
+  echo "  -p : Prints current Xcode path"
+  echo "  -s [xcode_version] : Switch command line tools"
+  echo "  -o [xcode_version] [project_file] : Open project with the specified Xcode version"
+  echo "  -o : Open workspace or project in current directory with default Xcode version"
+  echo "  -d : Shows Xcode installed versions"
+  echo "  -m : Display available simulators"
+  echo "  -x : Update (carthage & xcodegen) and open project with default settings"
 
   exit 0
 fi
@@ -76,6 +99,7 @@ fi
 if [ $operation = "-s" ]; then
   if [ -z $2 ]; then
     echo "Missing Xcode version"
+    echo "Usage: xcbuddy -s [xcode_version]"
     exit 1
   fi
 
@@ -129,7 +153,9 @@ fi
 # Update and open
 # usage: xcbuddy -x
 if [ $operation = "-x" ]; then
-  carthage bootstrap --platform ios
-  xcodegen
+  resolve_dependencies
+  generate_project
   xcbuddy -o
 fi
+
+
