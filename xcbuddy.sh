@@ -113,6 +113,8 @@ fi
 # Open Xcode project with an specific version
 # usage: xcbuddy -o [version] [project]
 if [ $operation = "-o" ]; then
+  xcode_app_name="Xcode.app"
+  
   if [ -z $2 ]; then
     xcode_app_name=$(find_current_xcode_app_name)
   else 
