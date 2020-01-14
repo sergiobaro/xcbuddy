@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # GLOBAL
-version="0.2"
+version="0.3"
 
 # FUNCTIONS
 
@@ -70,13 +70,19 @@ if [ $operation = "-h" ]; then
   echo "Usage:"
   echo "  -h : Prints help"
   echo "  -v : Prints current xcbuddy version"
+
+  echo " Xcode:"
   echo "  -p : Prints current Xcode path"
   echo "  -s [xcode_version] : Switch command line tools"
   echo "  -o [xcode_version] [project_file] : Open project with the specified Xcode version"
   echo "  -o : Open workspace or project in current directory with default Xcode version"
   echo "  -d : Shows Xcode installed versions"
-  echo "  -m : Display available simulators"
   echo "  -x : Update (carthage & xcodegen) and open project with default settings"
+
+  echo " Simulator:"
+  echo "  sim l: Shows available simulators"
+  echo "  sim s [file.png]: Takes screenshot from current simulator"
+  echo "  sim r [file.mov]: Records video from current simulator"
 
   exit 0
 fi
@@ -145,13 +151,6 @@ if [ $operation = "-d" ]; then
   exit 0
 fi
 
-# Display simulators
-# usage: xcbuddy -m
-if [ $operation = "-m" ]; then
-  xcrun simctl list devices available
-  exit 0
-fi
-
 # Update and open
 # usage: xcbuddy -x
 if [ $operation = "-x" ]; then
@@ -161,3 +160,48 @@ if [ $operation = "-x" ]; then
 fi
 
 
+## SIMULATORS
+
+# Display simulators
+# usage: xcbuddy sim listls
+if [ $operation = "sim" ]; then
+  command=$2
+  if [ -z $command ]; then 
+    command="l"
+  fi
+
+  # List simulators
+  if [ $command = "l" ]; then
+    xcrun simctl list devices available
+    exit 0
+  fi
+
+  # Takes screenshot
+  if [ $command = "s" ]; then
+    file=$3
+    if [ -z $file ]; then 
+      file="screenshot.png"
+    fi
+    xcrun simctl io booted screenshot $file
+    if [ $? -eq 0 ]; then
+      open $file
+    fi
+    exit 0
+  fi
+
+  # Records video
+  if [ $command = "r" ]; then
+    file=$3
+    if [ -z $file ]; then
+      file="video.mov"
+    fi
+    echo "Recording... press ^C to finish"
+    # `h264` gives better frame rate than `hevc`
+    xcrun simctl io booted recordVideo --codec=h264 --force $file
+    if [ $? -eq 0 ]; then
+      open $file
+    fi
+    exit 0
+  fi
+
+fi
