@@ -81,6 +81,7 @@ if [ $operation = "-h" ]; then
 
   echo " Simulator:"
   echo "  sim l: Shows available simulators"
+  echo "  sim o [url]: Open url in current simulator"
   echo "  sim s [file.png]: Takes screenshot from current simulator"
   echo "  sim r [file.mov]: Records video from current simulator"
 
@@ -173,6 +174,22 @@ if [ $operation = "sim" ]; then
   # List simulators
   if [ $command = "l" ]; then
     xcrun simctl list devices available
+    exit 0
+  fi
+
+  # Open url
+  if [ $command = "o" ]; then
+    url=$3
+    if [ -z $url ]; then
+      echo "Missing url parameter"
+      echo "Usage: xcbuddy sim o [url]"
+      exit 1
+    fi
+    if [[ ! $url = "https://"* ]] && [[ ! $url = "http://"* ]]; then
+      url="https://$url"
+    fi
+    echo "xcrun simctl openurl booted $url"
+    xcrun simctl openurl booted $url
     exit 0
   fi
 
