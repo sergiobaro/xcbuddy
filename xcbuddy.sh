@@ -135,12 +135,12 @@ if [ $operation = "-o" ]; then
     project=$3
   fi
 
-  if [ -z $project ]; then
+  if [ -z "$project" ]; then
     echo "Project file not found"
     exit 1
   fi
   
-  open -a $xcode_app_name $project
+  open -a $xcode_app_name "$project"
 
   exit 0
 fi
