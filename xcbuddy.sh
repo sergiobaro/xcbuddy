@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # GLOBAL
-version="0.3"
+version="0.4"
 
 # FUNCTIONS
 
@@ -17,7 +17,7 @@ find_current_xcode_app_name () {
   echo $xcode_app_name
 }
 
-# Find in current directory a workspace or project file
+# Find in current directory a workspace or a project file
 find_xcode_workspace_or_project () {
   for file in *.xcworkspace; do
     if [[ -d $file ]]; then
@@ -73,11 +73,12 @@ if [ $operation = "-h" ]; then
 
   echo " Xcode:"
   echo "  -p : Prints current Xcode path"
-  echo "  -s [xcode_version] : Switch command line tools"
-  echo "  -o [xcode_version] [project_file] : Open project with the specified Xcode version"
-  echo "  -o : Open workspace or project in current directory with default Xcode version"
-  echo "  -d : Shows Xcode installed versions"
-  echo "  -x : Update (carthage & xcodegen) and open project with default settings"
+  echo "  -s [xcode_version] : Switches command line tools"
+  echo "  -o [xcode_version] [project_file] : Opens project with the specified Xcode version"
+  echo "  -o : Opens workspace or project in current directory with default Xcode version"
+  echo "  -l : Shows Xcode installed versions"
+  echo "  -u : Updates dependencies and generates the project file if needed"
+  echo "  -x : Updates and then opens"
 
   echo " Simulator:"
   echo "  sim l: Shows available simulators"
@@ -145,18 +146,24 @@ if [ $operation = "-o" ]; then
   exit 0
 fi
 
-# Show Xcode installed versions
-# usage: xcbuddy -d
-if [ $operation = "-d" ]; then
+# List Xcode installed versions
+# usage: xcbuddy -l
+if [ $operation = "-l" ]; then
   ls /Applications | grep "Xcode"
   exit 0
+fi
+
+# Update project
+# usage: xcbuddy -u
+if [ $operation = "-u" ]; then
+  resolve_dependencies
+  generate_project
 fi
 
 # Update and open
 # usage: xcbuddy -x
 if [ $operation = "-x" ]; then
-  resolve_dependencies
-  generate_project
+  xcbuddy -u
   xcbuddy -o
 fi
 
@@ -164,7 +171,7 @@ fi
 ## SIMULATORS
 
 # Display simulators
-# usage: xcbuddy sim listls
+# usage: xcbuddy sim list
 if [ $operation = "sim" ]; then
   command=$2
   if [ -z $command ]; then 
@@ -193,7 +200,7 @@ if [ $operation = "sim" ]; then
     exit 0
   fi
 
-  # Takes screenshot
+  # Take screenshot
   if [ $command = "s" ]; then
     file=$3
     if [ -z $file ]; then 
@@ -206,7 +213,7 @@ if [ $operation = "sim" ]; then
     exit 0
   fi
 
-  # Records video
+  # Record video
   if [ $command = "r" ]; then
     file=$3
     if [ -z $file ]; then
