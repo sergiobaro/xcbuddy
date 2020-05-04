@@ -1,2 +1,2 @@
 install:
-	sudo cp xcbuddy.sh /usr/local/bin/xcbuddy
+	cp xcbuddy.sh /usr/local/bin/xcbuddy
