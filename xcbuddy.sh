@@ -1,9 +1,9 @@
 #!/bin/bash
 
-set -e
+set -e # exit when a command fails
 
 # GLOBAL
-version="0.4"
+version="0.5"
 
 # FUNCTIONS
 
