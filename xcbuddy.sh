@@ -79,6 +79,7 @@ if [ $operation = "-h" ]; then
   echo "  -l : Shows Xcode installed versions"
   echo "  -u : Updates dependencies and generates the project file if needed"
   echo "  -x : Updates and then opens"
+  echo "  -c : Shows Xcode cache size ('DerivedData' & 'iOS DeviceSupport')"
 
   echo " Simulator:"
   echo "  sim l: Shows available simulators"
@@ -167,6 +168,16 @@ if [ $operation = "-x" ]; then
   xcbuddy -o
 fi
 
+# Shows Xcode cache
+# usage: xcbuddy -c 
+if [ $operation = "-c" ]; then
+  default_derived_data=~/Library/Developer/Xcode/DerivedData
+  # find "$default_derived_data" -maxdepth 1 -exec du -hs {} \;
+  du -hs "$default_derived_data"
+
+  ios_device_support=~/Library/Developer/Xcode/iOS\ DeviceSupport
+  find "$ios_device_support" -maxdepth 1 -exec du -hs {} \;
+fi
 
 ## SIMULATORS
 
