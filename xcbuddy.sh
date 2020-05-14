@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # GLOBAL
 version="0.4"
 
