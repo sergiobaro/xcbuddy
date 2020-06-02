@@ -4,6 +4,8 @@ set -e # exit when a command fails
 
 # GLOBAL
 version="0.5"
+default_derived_data_folder=~/Library/Developer/Xcode/DerivedData
+ios_device_support_folder=~/Library/Developer/Xcode/iOS\ DeviceSupport
 
 # FUNCTIONS
 
@@ -82,6 +84,7 @@ if [ $operation = "-h" ]; then
   echo "  -u : Updates dependencies and generates the project file if needed"
   echo "  -x : Updates and then opens"
   echo "  -c : Shows Xcode cache size ('DerivedData' & 'iOS DeviceSupport')"
+  echo "  -r : Removes Xcode default derived data folder"
 
   echo " Simulator:"
   echo "  sim l: Shows available simulators"
@@ -162,6 +165,7 @@ fi
 if [ $operation = "-u" ]; then
   resolve_dependencies
   generate_project
+  exit 0
 fi
 
 # Update and open
@@ -169,17 +173,23 @@ fi
 if [ $operation = "-x" ]; then
   xcbuddy -u
   xcbuddy -o
+  exit 0
 fi
 
 # Shows Xcode cache
 # usage: xcbuddy -c 
 if [ $operation = "-c" ]; then
-  default_derived_data=~/Library/Developer/Xcode/DerivedData
-  # find "$default_derived_data" -maxdepth 1 -exec du -hs {} \;
-  du -hs "$default_derived_data"
+  du -hs "$default_derived_data_folder" || true
+  find "$ios_device_support_folder" -maxdepth 1 -exec du -hs '{}' \;
+  exit 0
+fi
 
-  ios_device_support=~/Library/Developer/Xcode/iOS\ DeviceSupport
-  find "$ios_device_support" -maxdepth 1 -exec du -hs {} \;
+# Remove Xcode derived data folder
+# usage: xcbuddy -r
+if [ $operation = "-r" ]; then
+  echo "Deleting ${default_derived_data_folder}/*"
+  find $default_derived_data_folder -mindepth 1 -exec rm -rf '{}' \;
+  exit 0
 fi
 
 ## SIMULATORS
@@ -249,3 +259,6 @@ if [ $operation = "sim" ]; then
   fi
 
 fi
+## END SIMULATORS
+
+echo "Operation '${operation}' not supported"
