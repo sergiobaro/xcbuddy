@@ -88,6 +88,7 @@ if [ $operation = "-h" ]; then
   echo "  sim o [url]: Open url in current simulator"
   echo "  sim s [file.png]: Takes screenshot from current simulator"
   echo "  sim r [file.mov]: Records video from current simulator"
+  echo "  sim p [json] [bundle]: Sends a push to the current simulator"
 
   exit 0
 fi
@@ -238,6 +239,12 @@ if [ $operation = "sim" ]; then
     if [ $? -eq 0 ]; then
       open $file
     fi
+    exit 0
+  fi
+
+  # Send push
+  if [ $command = "p" ]; then
+    xcrun simctl push booted $3 $4
     exit 0
   fi
 
