@@ -11,8 +11,10 @@ $ make install
 ## Usage
 
 ```
+General:
   -h : Prints help
   -v : Prints current xcbuddy version
+
  Xcode:
   -p : Prints current Xcode path
   -s [xcode_version] : Switches command line tools
@@ -23,6 +25,10 @@ $ make install
   -x : Updates and then opens
   -c : Shows Xcode cache size ('DerivedData' & 'iOS DeviceSupport')
   -r : Removes Xcode default derived data folder
+
+ Provisioning Profiles:
+  prof l: Shows installed profiles
+
  Simulator:
   sim l: Shows available simulators
   sim o [url]: Open url in current simulator

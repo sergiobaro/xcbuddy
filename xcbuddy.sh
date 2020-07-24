@@ -6,6 +6,7 @@ set -e # exit when a command fails
 version="0.5"
 default_derived_data_folder=~/Library/Developer/Xcode/DerivedData
 ios_device_support_folder=~/Library/Developer/Xcode/iOS\ DeviceSupport
+provisioning_profiles_folder=~/Library/MobileDevice/Provisioning\ Profiles
 
 # FUNCTIONS
 
@@ -71,10 +72,11 @@ fi
 # Display help
 # usage: xcbuddy -h
 if [ $operation = "-h" ]; then
-  echo "Usage:"
+  echo ""
+  echo "General:"
   echo "  -h : Prints help"
   echo "  -v : Prints current xcbuddy version"
-
+  echo ""
   echo " Xcode:"
   echo "  -p : Prints current Xcode path"
   echo "  -s [xcode_version] : Switches command line tools"
@@ -85,13 +87,17 @@ if [ $operation = "-h" ]; then
   echo "  -x : Updates and then opens"
   echo "  -c : Shows Xcode cache size ('DerivedData' & 'iOS DeviceSupport')"
   echo "  -r : Removes Xcode default derived data folder"
-
+  echo ""
+  echo " Provisioning Profiles:"
+  echo "  prof l: Shows installed profiles"
+  echo ""
   echo " Simulator:"
   echo "  sim l: Shows available simulators"
   echo "  sim o [url]: Open url in current simulator"
   echo "  sim s [file.png]: Takes screenshot from current simulator"
   echo "  sim r [file.mov]: Records video from current simulator"
   echo "  sim p [json] [bundle]: Sends a push to the current simulator"
+  echo ""
 
   exit 0
 fi
@@ -190,6 +196,28 @@ if [ $operation = "-r" ]; then
   echo "Deleting ${default_derived_data_folder}/*"
   find $default_derived_data_folder -mindepth 1 -exec rm -rf '{}' \;
   exit 0
+fi
+
+## PROVISIONING PROFILES
+if [ $operation = "prof" ]; then
+  command=$2
+  if [ -z $command ]; then 
+    command="l"
+  fi
+
+# List
+  if [ $command = "l" ]; then
+    for profile in "$provisioning_profiles_folder"/*.mobileprovision; do
+      filename=${profile##*/}
+      echo -n "$filename: "
+      security cms -D -i "$profile" > temp.plist # decrypt the profile
+      profileName=`/usr/libexec/PlistBuddy -c "print :Name" temp.plist`
+      echo "=> '$profileName'"
+    done
+    rm temp.plist
+    exit 0
+  fi
+
 fi
 
 ## SIMULATORS
