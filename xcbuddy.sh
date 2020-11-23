@@ -91,13 +91,6 @@ if [ $operation = "-h" ]; then
   echo " Provisioning Profiles:"
   echo "  prof l: Shows installed profiles"
   echo ""
-  echo " Simulator:"
-  echo "  sim l: Shows available simulators"
-  echo "  sim o [url]: Open url in current simulator"
-  echo "  sim s [file.png]: Takes screenshot from current simulator"
-  echo "  sim r [file.mov]: Records video from current simulator"
-  echo "  sim p [json] [bundle]: Sends a push to the current simulator"
-  echo ""
 
   exit 0
 fi
@@ -219,74 +212,5 @@ if [ $operation = "prof" ]; then
   fi
 
 fi
-
-## SIMULATORS
-
-# Display simulators
-# usage: xcbuddy sim list
-if [ $operation = "sim" ]; then
-  command=$2
-  if [ -z $command ]; then 
-    command="l"
-  fi
-
-  # List simulators
-  if [ $command = "l" ]; then
-    xcrun simctl list devices available
-    exit 0
-  fi
-
-  # Open url
-  if [ $command = "o" ]; then
-    url=$3
-    if [ -z $url ]; then
-      echo "Missing url parameter"
-      echo "Usage: xcbuddy sim o [url]"
-      exit 1
-    fi
-    if [[ ! $url = "https://"* ]] && [[ ! $url = "http://"* ]]; then
-      url="https://$url"
-    fi
-    echo "xcrun simctl openurl booted $url"
-    xcrun simctl openurl booted $url
-    exit 0
-  fi
-
-  # Take screenshot
-  if [ $command = "s" ]; then
-    file=$3
-    if [ -z $file ]; then 
-      file="screenshot.png"
-    fi
-    xcrun simctl io booted screenshot $file
-    if [ $? -eq 0 ]; then
-      open $file
-    fi
-    exit 0
-  fi
-
-  # Record video
-  if [ $command = "r" ]; then
-    file=$3
-    if [ -z $file ]; then
-      file="video.mov"
-    fi
-    echo "Recording... press ^C to finish"
-    # `h264` gives better frame rate than `hevc`
-    xcrun simctl io booted recordVideo --codec=h264 --force $file
-    if [ $? -eq 0 ]; then
-      open $file
-    fi
-    exit 0
-  fi
-
-  # Send push
-  if [ $command = "p" ]; then
-    xcrun simctl push booted $3 $4
-    exit 0
-  fi
-
-fi
-## END SIMULATORS
 
 echo "Operation '${operation}' not supported"
