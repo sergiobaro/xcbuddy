@@ -132,6 +132,7 @@ if [ $operation = "-o" ]; then
   fi
   echo "Opening... $sim_name"
   open -a Simulator --args -CurrentDeviceUDID "$sim_id"
+  xcrun simctl boot "$sim_id"
   exit 0
 fi
 
