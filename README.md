@@ -50,4 +50,5 @@ Script to handle installed provisioning profiles.
 ```
   -h : Prints help
   -l : Shows installed profiles
+  -o : Opens profiles folder
 ```
