@@ -21,7 +21,7 @@ Script to open projects with a specific Xcode version. In order for this to work
   -o : Opens workspace or project in current directory with default Xcode version
   -l : Shows Xcode installed versions
   -u : Updates dependencies and generates the project file if needed
-  -x : Updates and then opens
+  -x [xcode_version] [project_file] : Updates and then opens
   -c : Shows Xcode cache size ('DerivedData' & 'iOS DeviceSupport')
   -r : Removes Xcode default derived data folder
 ```
