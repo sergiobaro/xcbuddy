@@ -81,7 +81,7 @@ if [ $operation = "-h" ]; then
   echo "  -o : Opens workspace or project in current directory with default Xcode version"
   echo "  -l : Shows Xcode installed versions"
   echo "  -u : Updates dependencies and generates the project file if needed"
-  echo "  -x : Updates and then opens"
+  echo "  -x [xcode_version] [project_file] : Updates and then opens"
   echo "  -c : Shows Xcode cache size ('DerivedData' & 'iOS DeviceSupport')"
   echo "  -r : Removes Xcode default derived data folder"
   echo ""
@@ -165,7 +165,7 @@ fi
 # usage: xcbuddy -x
 if [ $operation = "-x" ]; then
   xcbuddy -u
-  xcbuddy -o
+  xcbuddy -o $2 $3
   exit 0
 fi
 
