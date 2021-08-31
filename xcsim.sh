@@ -23,6 +23,7 @@ if [ $operation = "-h" ]; then
   echo "  -p [json] [bundle] : Sends a push to the current simulator"
   echo "  -c : Deletes unavailable simulators"
   echo "  -o [UUID] : Opens a simulator"
+  echo "  -a [app bundle identifier]: Reveals in Finder the documents folder for the app specified"
   echo ""
 
   exit 0
@@ -133,6 +134,21 @@ if [ $operation = "-o" ]; then
   echo "Opening... $sim_name"
   open -a Simulator --args -CurrentDeviceUDID "$sim_id"
   xcrun simctl boot "$sim_id"
+  exit 0
+fi
+
+# Open App folder
+
+if [ $operation = "-a" ]; then
+  app_id=$2
+  if [ -z "$app_id" ]; then
+    echo "Missing [app bundle identifier]"
+    exit 1
+  fi
+
+  folder="$(xcrun simctl get_app_container booted "$app_id" data)/Documents"
+  echo "$folder"
+  open -R "$folder"
   exit 0
 fi
 
