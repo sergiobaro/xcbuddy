@@ -3,7 +3,7 @@
 set -e # exit when a command fails
 
 # GLOBAL
-version="0.5"
+version="0.6"
 default_derived_data_folder=~/Library/Developer/Xcode/DerivedData
 ios_device_support_folder=~/Library/Developer/Xcode/iOS\ DeviceSupport
 provisioning_profiles_folder=~/Library/MobileDevice/Provisioning\ Profiles
@@ -36,6 +36,9 @@ find_xcode_workspace_or_project () {
       return
     fi
   done
+  if [ -f "Package.swift" ]; then
+    echo "Package.swift"
+  fi
 }
 
 # Resolve dependencies for: carthage, pods and swift package manager
