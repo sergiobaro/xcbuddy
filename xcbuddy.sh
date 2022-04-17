@@ -3,7 +3,7 @@
 set -e # exit when a command fails
 
 # GLOBAL
-version="0.6"
+version="0.6.1"
 default_derived_data_folder=~/Library/Developer/Xcode/DerivedData
 ios_device_support_folder=~/Library/Developer/Xcode/iOS\ DeviceSupport
 provisioning_profiles_folder=~/Library/MobileDevice/Provisioning\ Profiles
@@ -24,18 +24,21 @@ find_current_xcode_app_name () {
 
 # Find in current directory a workspace or a project file
 find_xcode_workspace_or_project () {
+  # look for workspace
   for file in *.xcworkspace; do
     if [[ -d $file ]]; then
       echo "$file"
       return
     fi
   done
+  # look for project
   for file in *.xcodeproj; do
     if [[ -d $file ]]; then
       echo "$file"
       return
     fi
   done
+  # look for package
   if [ -f "Package.swift" ]; then
     echo "Package.swift"
   fi
@@ -96,6 +99,7 @@ fi
 # usage: xcbuddy -v
 if [ $operation = "-v" ]; then
   echo "$version"
+  exit 0
 fi
 
 # Print command line tools current path
