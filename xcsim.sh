@@ -43,7 +43,7 @@ if [ $operation = "-u" ]; then
     echo "Usage: xcbuddy sim o [url]"
     exit 1
   fi
-  if [[ ! $url = "https://"* ]] && [[ ! $url = "http://"* ]]; then
+  if [[ ! $url = *"://"* ]]; then
     url="https://$url"
   fi
   echo "xcrun simctl openurl booted $url"
