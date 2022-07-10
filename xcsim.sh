@@ -23,7 +23,8 @@ if [ $operation = "-h" ]; then
   echo "  -p [json] [bundle] : Sends a push to the current simulator"
   echo "  -c : Deletes unavailable simulators"
   echo "  -o [UUID] : Opens a simulator"
-  echo "  -a [app bundle identifier]: Reveals in Finder the documents folder for the app specified"
+  echo "  -a [app bundle identifier] : Reveals in Finder the documents folder for the app specified"
+  echo "  -f [UUID] : Open device folder"
   echo ""
 
   exit 0
@@ -31,7 +32,7 @@ fi
 
 # List simulators
 if [ $operation = "-l" ]; then
-  xcrun simctl list devices available
+  xcrun simctl list devices 
   exit 0
 fi
 
@@ -93,33 +94,39 @@ fi
 
 # Open simulator
 
-select_sim () {
-  # iPhone 8 (1B6CC249-26AF-4987-8349-E53F87747E88) (Shutdown)
-  local sim_regex="^([[:alnum:][:blank:]\(\)-]+) \(([A-Z0-9\-]+)\) \(([A-Za-z]+)\)"
+# iPhone 8 (1B6CC249-26AF-4987-8349-E53F87747E88) (Shutdown)
+sim_regex="^([[:alnum:][:blank:]\(\)-]+) \(([A-Z0-9\-]+)\) \(([A-Za-z]+)\)"
+  
+get_sim_info () {
+  local sim_string=$1
+  
+  if [[ $sim_string =~ $sim_regex ]]; then
+    local sim_name=${BASH_REMATCH[1]}
+    local sim_id=${BASH_REMATCH[2]}
+    local sim_status=${BASH_REMATCH[3]}
+    echo "$sim_id $sim_name $sim_status"
+  fi
+}
 
+select_sim () {
   local sims=""
   while read -r line ; do
     if [[ $line =~ $sim_regex ]]; then
       sims+="$line"
       sims+=$'\n'
     fi
-  done < <(xcrun simctl list devices)
+  done < <(xcrun simctl list devices available)
 
   local oldIFS=$IFS
   IFS=$'\n'
   local choices=( $sims )
   IFS=$oldIFS
 
-  PS3="Select:"
+  PS3="Select: "
   select sim in "${choices[@]}"; do
     for item in "${choices[@]}"; do
       if [[ $item == $sim ]]; then
-        if [[ $item =~ $sim_regex ]]; then
-          local sim_name=${BASH_REMATCH[1]}
-          local sim_id=${BASH_REMATCH[2]}
-          # local sim_status=${BASH_REMATCH[3]}
-          echo "$sim_id $sim_name"
-        fi
+        echo $(get_sim_info "$item")
         break 2
       fi
     done
@@ -128,8 +135,8 @@ select_sim () {
 
 if [ $operation = "-o" ]; then
   sim_id=$2
-  if [ -z "$sim_name" ]; then
-    read sim_id sim_name < <(select_sim)
+  if [ -z "$sim_id" ]; then
+    read sim_id sim_name sim_status < <(select_sim)
   fi
   echo "Opening... $sim_name"
   open -a Simulator --args -CurrentDeviceUDID "$sim_id"
@@ -149,6 +156,21 @@ if [ $operation = "-a" ]; then
   folder="$(xcrun simctl get_app_container booted "$app_id" data)/Documents"
   echo "$folder"
   open -R "$folder"
+  exit 0
+fi
+
+# Open simulator folder
+
+if [ $operation = "-f" ]; then 
+  sim_id=$2
+  if [ -z "$sim_id" ]; then
+    sim_booted="$(xcrun simctl list | grep Booted)"
+    read sim_id sim_name sim_status < <(get_sim_info "$sim_booted")
+  fi
+
+  folder="$HOME/Library/Developer/CoreSimulator/Devices/$sim_id"
+  echo "$folder"
+  open "$folder"
   exit 0
 fi
 
