@@ -72,7 +72,7 @@ generate_project () {
 operation=$1
 
 if [ -z $operation ]; then
-  operation="-h"
+  operation="-o"
 fi
 
 # Display help
