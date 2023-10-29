@@ -3,10 +3,9 @@
 set -e # exit when a command fails
 
 # GLOBAL
-version="0.6.1"
+version="0.6.2"
 default_derived_data_folder=~/Library/Developer/Xcode/DerivedData
 ios_device_support_folder=~/Library/Developer/Xcode/iOS\ DeviceSupport
-provisioning_profiles_folder=~/Library/MobileDevice/Provisioning\ Profiles
 
 # FUNCTIONS
 
@@ -19,7 +18,7 @@ find_current_xcode_app_name () {
     fi
   done
 
-  echo $xcode_app_name
+  echo "$xcode_app_name"
 }
 
 # Find in current directory a workspace or a project file
@@ -71,13 +70,13 @@ generate_project () {
 
 operation=$1
 
-if [ -z $operation ]; then
+if [ -z "$operation" ]; then
   operation="-o"
 fi
 
 # Display help
 # usage: xcbuddy -h
-if [ $operation = "-h" ]; then
+if [ "$operation" = "-h" ]; then
   echo ""
   echo "  -h : Prints help"
   echo "  -v : Prints current xcbuddy version"
@@ -97,22 +96,22 @@ fi
 
 # Print current xcbuddy version
 # usage: xcbuddy -v
-if [ $operation = "-v" ]; then
+if [ "$operation" = "-v" ]; then
   echo "$version"
   exit 0
 fi
 
 # Print command line tools current path
 # usage: xcbuddy -p
-if [ $operation = "-p" ]; then
+if [ "$operation" = "-p" ]; then
   xcode-select -p
   exit 0
 fi
 
 # Change command line tools
 # usage: xcbuddy -s [version]
-if [ $operation = "-s" ]; then
-  if [ -z $2 ]; then
+if [ "$operation" = "-s" ]; then
+  if [ -z "$2" ]; then
     echo "Missing Xcode version"
     echo "Usage: xcbuddy -s [xcode_version]"
     exit 1
@@ -121,23 +120,23 @@ if [ $operation = "-s" ]; then
   xcode_version=$2
   xcode_path="/Applications/Xcode_$xcode_version.app/Contents/Developer"
   echo "Switch to: $xcode_path"
-  sudo xcode-select -s $xcode_path
+  sudo xcode-select -s "$xcode_path"
   exit 0
 fi
 
 # Open Xcode project with an specific version
 # usage: xcbuddy -o [version] [project]
-if [ $operation = "-o" ]; then
+if [ "$operation" = "-o" ]; then
   xcode_app_name="Xcode.app"
   
-  if [ -z $2 ]; then
+  if [ -z "$2" ]; then
     xcode_app_name=$(find_current_xcode_app_name)
   else 
     xcode_version=$2
     xcode_app_name="Xcode_$xcode_version.app"
   fi
   
-  if [ -z $3 ]; then
+  if [ -z "$3" ]; then
     project=$(find_xcode_workspace_or_project)
   else
     project=$3
@@ -148,21 +147,23 @@ if [ $operation = "-o" ]; then
     exit 1
   fi
   
-  open -a $xcode_app_name "$project"
+  open -a "$xcode_app_name" "$project"
 
   exit 0
 fi
 
 # List Xcode installed versions
 # usage: xcbuddy -l
-if [ $operation = "-l" ]; then
-  ls /Applications | grep "Xcode"
+if [ "$operation" = "-l" ]; then
+  for f in /Applications/Xcode*; do
+    echo "$f"
+  done
   exit 0
 fi
 
 # Update project
 # usage: xcbuddy -u
-if [ $operation = "-u" ]; then
+if [ "$operation" = "-u" ]; then
   resolve_dependencies
   generate_project
   exit 0
@@ -170,15 +171,15 @@ fi
 
 # Update and open
 # usage: xcbuddy -x
-if [ $operation = "-x" ]; then
+if [ "$operation" = "-x" ]; then
   xcbuddy -u
-  xcbuddy -o $2 $3
+  xcbuddy -o "$2" "$3"
   exit 0
 fi
 
 # Shows Xcode cache
 # usage: xcbuddy -c 
-if [ $operation = "-c" ]; then
+if [ "$operation" = "-c" ]; then
   du -hs "$default_derived_data_folder" || true
   find "$ios_device_support_folder" -maxdepth 1 -exec du -hs '{}' \;
   exit 0
@@ -186,7 +187,7 @@ fi
 
 # Remove Xcode derived data folder
 # usage: xcbuddy -r
-if [ $operation = "-r" ]; then
+if [ "$operation" = "-r" ]; then
   echo "Deleting ${default_derived_data_folder}/*"
   find $default_derived_data_folder -mindepth 1 -exec rm -rf '{}' \;
   exit 0

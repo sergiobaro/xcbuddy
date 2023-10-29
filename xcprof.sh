@@ -3,19 +3,21 @@
 set -e # exit when a command fails
 
 # GLOBAL
+version="0.5.0"
 provisioning_profiles_folder="$HOME/Library/MobileDevice/Provisioning Profiles"
 
 # ARGS
 operation=$1
-if [ -z $operation ]; then 
+if [ -z "$operation" ]; then 
   operation="-h"
 fi
 
 # Display help
 # usage: xcsim -h
-if [ $operation = "-h" ]; then
+if [ "$operation" = "-h" ]; then
   echo ""
   echo "  -h : Prints help"
+  echo "  -v : Prints current xcprof version"
   echo "  -l : Shows installed profiles"
   echo "  -o : Opens profiles folder"
   echo ""
@@ -23,13 +25,19 @@ if [ $operation = "-h" ]; then
   exit 0
 fi
 
+# Prints version
+if [ "$operation" = "-v" ]; then
+  echo "$version"
+  exit 0
+fi
+
 # List profiles
-if [ $operation = "-l" ]; then
+if [ "$operation" = "-l" ]; then
   for profile in "$provisioning_profiles_folder"/*.{mobileprovision,provisionprofile}; do
     filename=${profile##*/}
     echo -n "$filename: "
     security cms -D -i "$profile" > temp.plist # decrypt the profile
-    profileName=`/usr/libexec/PlistBuddy -c "print :Name" temp.plist`
+    profileName=$(/usr/libexec/PlistBuddy -c "print :Name" temp.plist)
     echo "=> '$profileName'"
   done
   rm temp.plist
@@ -37,6 +45,6 @@ if [ $operation = "-l" ]; then
 fi
 
 # Open profiles folder
-if [ $operation = "-o" ]; then
+if [ "$operation" = "-o" ]; then
   open "$provisioning_profiles_folder"
 fi
